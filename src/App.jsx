@@ -39,12 +39,22 @@ function App() {
     if (currentScore + 1 > bestScore) {
       setBestScore(currentScore + 1);
     }
+    if (currentScore + 1 == level) {
+      winNotification();
+    }
+  }
+  function winNotification() {
+    alert("Congrats, you beat the game!!!");
   }
 
   function onFailPath(data) {
+    failNotification();
     addClickState(data);
     setSampleProcedure(data);
     setCurrentScore(0);
+  }
+  function failNotification() {
+    alert("Better Next Time!");
   }
 
   function setSampleProcedure(data) {
