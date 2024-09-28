@@ -1,14 +1,17 @@
 export default function Card({
   samplePokemon,
   id,
-  setSampleProcedure,
+  onSuccessPath,
+  onFailPath,
   name,
   url,
 }) {
   function handleOnClick() {
     if (!samplePokemon[id].clicked) {
       samplePokemon[id].clicked = true;
-      setSampleProcedure(samplePokemon);
+      onSuccessPath(samplePokemon);
+    } else {
+      onFailPath(samplePokemon);
     }
   }
   return (

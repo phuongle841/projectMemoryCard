@@ -2,13 +2,13 @@
   background-color: rgb(25, 29, 32);
   border: 2px solid snow;
   border-radius: 10px;
-  width: 200px;
+  width: 150px;
   cursor: pointer;
 }
 .card:hover {
+  box-shadow: 10px 10px 10px #5abbb6;
   transform: scale(102%);
-  background-color: rgb(125, 128, 131);
 }
 img {
-  transform: scale(200%);
+  transform: scale(150%);
 }
