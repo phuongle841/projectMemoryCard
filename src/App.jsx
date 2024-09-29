@@ -2,9 +2,14 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import "./style/card.css";
 import { getSpecificPokemon } from "./api/apiCaller";
-import Card from "./components/Card";
+import { LevelBoard } from "./components/LevelBoard";
+import { ScoreBoard } from "./components/ScoreBoard";
+import { DisplayPokemon } from "./components/DisplayPokemon";
+import { randomIntFromInterval } from "./utils/randomIntFromInterval";
 
 function App() {
+  const lowerBounder = 0,
+    upperBounder = 800;
   let [level, setLevel] = useState(5);
   let [currentScore, setCurrentScore] = useState(0);
   let [bestScore, setBestScore] = useState(0);
@@ -13,7 +18,7 @@ function App() {
     function () {
       let ignore = false;
       setSamplePokemon(null);
-      getSpecificPokemon(level).then((data) => {
+      getSpecificPokemon(level, lowerBounder, upperBounder).then((data) => {
         if (!ignore) {
           addClickState(data);
           setSamplePokemon(data);
@@ -36,12 +41,8 @@ function App() {
   function onSuccessPath(data) {
     setSampleProcedure(data);
     setCurrentScore(currentScore + 1);
-    if (currentScore + 1 > bestScore) {
-      setBestScore(currentScore + 1);
-    }
-    if (currentScore + 1 == level) {
-      winNotification();
-    }
+    currentScore + 1 > bestScore && setBestScore(currentScore + 1);
+    currentScore + 1 == level && winNotification();
   }
   function winNotification() {
     alert("Congrats, you beat the game!!!");
@@ -53,6 +54,7 @@ function App() {
     setSampleProcedure(data);
     setCurrentScore(0);
   }
+
   function failNotification() {
     alert("Better Next Time!");
   }
@@ -71,19 +73,32 @@ function App() {
     }
     setSamplePokemon(newData);
   }
-  function randomIntFromInterval(min, max) {
-    // min and max included
-    return Math.floor(Math.random() * (max - min + 1) + min);
+
+  function getNewPatchPokemon() {
+    setSamplePokemon(null);
+    getSpecificPokemon(level, lowerBounder, upperBounder).then((data) => {
+      addClickState(data);
+      setSamplePokemon(data);
+    });
+    setCurrentScore(0);
   }
+
   return (
     <div>
-      <div>
-        <LevelBoard setLevel={setLevel} level={5}></LevelBoard>
-        <LevelBoard setLevel={setLevel} level={10}></LevelBoard>
-        <LevelBoard setLevel={setLevel} level={15}></LevelBoard>
+      <h1>Memory card game</h1>
+      <div className="status">
+        <h2>current level: {level}</h2>
+        <h3>
+          <button onClick={getNewPatchPokemon}>get new batch</button>
+        </h3>
+        <div>
+          <LevelBoard setLevel={setLevel} level={5}></LevelBoard>
+          <LevelBoard setLevel={setLevel} level={10}></LevelBoard>
+          <LevelBoard setLevel={setLevel} level={15}></LevelBoard>
+        </div>
       </div>
-      <ScoreBoard score={currentScore} name={"current"}></ScoreBoard>
-      <ScoreBoard score={bestScore} name={"best score"}></ScoreBoard>
+      <ScoreBoard score={currentScore} name={"current: "}></ScoreBoard>
+      <ScoreBoard score={bestScore} name={"best score: "}></ScoreBoard>
 
       <div className="board">
         {samplePokemon !== null ? (
@@ -100,41 +115,4 @@ function App() {
   );
 }
 
-function ScoreBoard({ score, name }) {
-  return (
-    <div className="scoreBoard">
-      <p>
-        {name} board:
-        <span>{score}</span>
-      </p>
-    </div>
-  );
-}
-
-function LevelBoard({ setLevel, level }) {
-  function onSetLevel() {
-    setLevel(level);
-  }
-  return <button onClick={onSetLevel}>{level}</button>;
-}
-
-function DisplayPokemon({ data, onSuccessPath, onFailPath }) {
-  return (
-    <>
-      {Object.keys(data).map((index) => {
-        return (
-          <Card
-            samplePokemon={data}
-            id={index}
-            onSuccessPath={onSuccessPath}
-            onFailPath={onFailPath}
-            key={data[index].name}
-            name={data[index].name}
-            url={data[index].pokemonPicture}
-          ></Card>
-        );
-      })}
-    </>
-  );
-}
 export default App;

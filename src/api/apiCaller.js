@@ -1,32 +1,11 @@
-const getPokemon = async (limit) => {
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}`)
-    .then((response) => response.json())
-    .then(async (rawData) => {
-      let NameAndURLs = [];
-      for (let i = 0; i < rawData.results.length; i++) {
-        const pokemonName = rawData.results[i].name;
+import { randomIntFromInterval } from "../utils/randomIntFromInterval";
 
-        const pokemonFrontDefault = await fetch(rawData.results[i].url)
-          .then((response) => response.json())
-          .then((fullPokemonData) => {
-            let front_default = fullPokemonData.sprites.front_default;
-            return front_default;
-          });
-        NameAndURLs.push({
-          name: pokemonName,
-          pokemonPicture: pokemonFrontDefault,
-        });
-      }
-      return NameAndURLs;
-    });
-  return res;
-};
-
-const getSpecificPokemon = async (limit) => {
+const getSpecificPokemon = async (limit, lowerBounder, upperBounder) => {
+  let idArray = getRandomNumberArray(limit, lowerBounder, upperBounder);
   let results = [];
   for (let index = 1; index < limit + 1; index++) {
     const response = await fetch(
-      `https://pokeapi.co/api/v2/pokemon/${index * 3}`
+      `https://pokeapi.co/api/v2/pokemon/${idArray[index - 1]}`
     );
     const data = await response.json();
     results.push({
@@ -36,5 +15,14 @@ const getSpecificPokemon = async (limit) => {
   }
   return results;
 };
+
+function getRandomNumberArray(length, lowerBounder, upperBounder) {
+  const results = [];
+  while (results.length < length) {
+    const nextNumber = randomIntFromInterval(lowerBounder, upperBounder);
+    results.push(nextNumber);
+  }
+  return results;
+}
+
 export { getSpecificPokemon };
-export default getPokemon;
